@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 此处与接口类地址对应 -->
+<mapper namespace="org.ptkl.webdemo.mapper.MessageMapper">
+    <!-- 此处与接口方法名对应 指定参数类型与返回结果类型-->
+    <select id="getMessageById" parameterType="java.lang.Integer" resultType="org.ptkl.webdemo.entity.MessageDto">
+        select * from message_board where id = #{id}
+    </select>
+
+    <select id="getMessage" resultType="org.ptkl.webdemo.entity.MessageDto">
+        select id ,
+                message
+        from message_board
+    </select>
+</mapper>
