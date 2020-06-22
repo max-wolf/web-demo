@@ -4,5 +4,8 @@ spring:
     driver-class-name:  org.postgresql.Driver
     username:  postgres
     password:  123456
+  devtools:
+    restart:
+      enabled: true
 mybatis:
   mapper-locations: classpath:mapper/*
