@@ -1,11 +1,10 @@
 package org.ptkl.webdemo.controller;
 
+import org.apache.commons.lang3.StringUtils;
 import org.ptkl.webdemo.entity.UserDto;
 import org.ptkl.webdemo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,11 +20,14 @@ public class UserController {
     UserService userService;
 
     @RequestMapping("/login")
-    public Map<String, String> login(String name, String password, HttpServletRequest request) {
+    public Map<String, String> login(@RequestBody UserDto user, HttpServletRequest request) {
         Map<String, String> map = new HashMap<>();
 
-        UserDto userDto = userService.getUserByName(name);
-        if (userDto.getPassword().equals(password)) {
+        System.out.println(user.getName());
+        System.out.println(user.getPassword());
+        UserDto userDto = userService.getUserByName(user.getName());
+        System.out.println(userDto);
+        if (userDto != null && StringUtils.equals(userDto.getPassword(), user.getPassword())) {
             map.put("result", "success");
             request.getSession().setAttribute("user", userDto);
         } else {

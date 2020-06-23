@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/message")
@@ -20,13 +22,19 @@ public class MessageController {
     MessageService messageService;
 
     @RequestMapping("/getMessageById")
-    public MessageDto getMessageById(String id, HttpSession session) {
+    public Map<String, Object> getMessageById(String id, HttpSession session) {
+        Map<String, Object> map = new HashMap<>();
         if (ObjectUtils.isEmpty(session.getAttribute("user"))) {
             System.out.println("**********not login*********");
-            return new MessageDto();
+            map.put("result", "fail");
+            return map;
         }
 
-        return messageService.getMessageById(Integer.valueOf(id));
+        MessageDto messageDto = messageService.getMessageById(Integer.valueOf(id));
+
+        map.put("result", "success");
+        map.put("messageDto", messageDto);
+        return map;
     }
 
     @RequestMapping("getMessage")

@@ -7,13 +7,32 @@
 </head>
 <body>
 <div id="app">
+    <el-button type="text" @click="dialogVisible = true">点击打开 Dialog</el-button>
+
+    <el-dialog
+            title="提示"
+            :visible.sync="dialogVisible"
+            :close-on-click-modal="false"
+            width="40%">
+        <span>
+            <el-input v-model="user_name" placeholder="用户名"></el-input>
+        </span>
+
+        <el-input v-model="user_password" placeholder="密码"></el-input>
+        <span slot="footer" class="dialog-footer">
+            <!--<el-button @click="dialogVisible = false">取 消</el-button>-->
+            <el-button type="primary" @click="loginClick">确 定</el-button>
+        </span>
+    </el-dialog>
+
+
     <el-button @click="btn0Click">Button</el-button>
 
     <el-input v-model="input" placeholder="请输入内容"></el-input>
 
-<!--
-    <div>{{message}}</div>
--->
+    <!--
+        <div>{{message}}</div>
+    -->
     <div v-html="message"></div>
 
     <el-button @click="btn1Click">Button</el-button>
@@ -35,11 +54,13 @@
                 <template slot-scope="scope">
                     <el-button
                             size="mini"
-                            @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                            @click="handleEdit(scope.$index, scope.row)">编辑
+                    </el-button>
                     <el-button
                             size="mini"
                             type="danger"
-                            @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                            @click="handleDelete(scope.$index, scope.row)">删除
+                    </el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -56,10 +77,13 @@
         el: '#app',
         data: function () {
             return {
+                user_name: '',
+                user_password: '',
+                dialogVisible: false,
                 btn0State: false,
                 message: '',
                 input: '',
-                items:[],
+                items: [],
                 messageDetail: {
                     id: 0,
                     message: ''
@@ -73,28 +97,54 @@
                         id: this.input
                     }
                 })
-                .then(response => {
-                    console.log(response);
-                    console.log('-----------');
-                    console.log(response.data.message);
-                    this.message = response.data.message;
-                })
-                .catch(function (error) {
-                    console.log(error);
-                });
+                    .then(response => {
+                        console.log(response);
+                        console.log('-----------');
+                        console.log(response.data);
+                        if (response.data.result === 'success') {
+                            this.message = response.data.messageDto.message;
+                        } else {
+                            this.dialogVisible = true;
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
             },
             btn1Click() {
                 axios.post('/message/getMessage', {
                     params: {}
                 })
-                .then(response => {
-                    console.log(response.data);
-                    this.items = response.data;
-                    console.log('-----------');
-                })
-                .catch(function (error) {
-                    console.log(error);
-                });
+                    .then(response => {
+                        console.log(response.data);
+                        this.items = response.data;
+                        console.log('-----------');
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+            loginClick() {
+                console.log(this.user_name);
+                console.log(this.user_password);
+                axios.post('/user/login', {
+                        name: this.user_name,
+                        password: this.user_password
+                },{
+                    headers: {'Content-Type': 'application/json'}
+                }).then(response => {
+                        console.log(response);
+                        console.log('-----------');
+                        console.log(response.data.result);
+                        if (response.data.result === 'success') {
+                            this.dialogVisible = false;
+                        } else {
+                            this.dialogVisible = true;
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
             }
         }
     })
