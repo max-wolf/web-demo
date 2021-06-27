@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <!-- import CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="app">
+    <el-button type="text" @click="dialogVisible = true">登录</el-button>
+    <br>
+
+    <el-row :gutter="20">
+        <el-col :span="13"><el-input v-model="payload" placeholder="payload"></el-input></el-col>
+        <el-col :span="3"><el-button type="primary" @click="payloadClick">输入</el-button></el-col>
+        <el-col :span="3"><el-button type="primary" @click="payload1Click">防xss输入</el-button></el-col>
+        <el-col :span="3"><el-button type="primary" @click="payload2Click">防xss输入1</el-button></el-col>
+    </el-row>
+
+    <el-dialog
+            title="提示"
+            :visible.sync="dialogVisible"
+            :close-on-click-modal="false"
+            width="40%">
+        <span>
+            <el-input v-model="user_name" placeholder="用户名"></el-input>
+        </span>
+
+        <el-input v-model="user_password" placeholder="密码"></el-input>
+        <span slot="footer" class="dialog-footer">
+            <!--<el-button @click="dialogVisible = false">取 消</el-button>-->
+            <el-button type="primary" @click="loginClick">确 定</el-button>
+        </span>
+    </el-dialog>
+
+    <el-dialog
+            title="提示"
+            :visible.sync="dialogSaveMsgVisible"
+            :close-on-click-modal="false"
+            width="40%">
+        <span>保存成功</span>
+
+        <span slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="dialogSaveMsgVisible = false">确 定</el-button>
+        </span>
+    </el-dialog>
+
+    <el-row :gutter="20">
+        <el-col :span="6"><el-input v-model="input" placeholder="请输入内容"></el-input></el-col>
+        <el-col :span="6"><el-button @click="btn0Click">appendChild</el-button></el-col>
+        <el-col :span="6"><el-button @click="btn1Click">eval</el-button></el-col>
+        <el-col :span="6"><el-button @click="btn2Click">document.write</el-button></el-col>
+        <el-col :span="6"><el-button @click="btn3Click">jQuery.html</el-button></el-col>
+    </el-row>
+
+
+    <el-row :gutter="20">
+        <el-col :span="24">
+            <div class="grid-content bg-purple">
+                <!-- 双花括号解释为字符串
+                    <div>{{message}}</div>
+                -->
+                <!-- v-html解释html标签-->
+                <!--<div id="xssmsg" v-html="message"></div>-->
+                <div id="xssmsg"></div>
+            </div>
+        </el-col>
+    </el-row>
+
+</div>
+</body>
+<!-- import Vue before Element -->
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<!-- import JavaScript -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+    new Vue({
+        el: '#app',
+        data: function () {
+            return {
+                payload: '',
+                user_name: '',
+                user_password: '',
+                dialogVisible: false,
+                dialogSaveMsgVisible: false,
+                btn0State: false,
+                message: '',
+                input: '',
+                items: [],
+                messageDetail: {
+                    id: 0,
+                    message: ''
+                }
+            }
+        },
+        methods: {
+            //appendChild
+            btn0Click() {
+                axios.get('/message/getMessageById', {
+                    params: {
+                        id: this.input
+                    }
+                })
+                    .then(response => {
+                        console.log(response);
+                        console.log('-----------');
+                        console.log(response.data);
+                        if (response.data.result === 'success') {
+                            this.message = response.data.messageDto.message;
+                            var html = response.data.messageDto.message;
+                            var cont = document.getElementById('xssmsg');
+                            cont.innerHTML = html;
+                            var oldScript = cont.getElementsByTagName('script')[0];
+                            if (oldScript != null) {
+                                cont.removeChild(oldScript);
+                            }
+                            var newScript = document.createElement('script');
+                            newScript.type = 'text/javascript';
+                            if (oldScript != null) {
+                                newScript.innerHTML = oldScript.innerHTML;
+                            }
+                            cont.appendChild(newScript);
+                        } else {
+                            this.dialogVisible = true;
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+            //eval
+            btn1Click() {
+                axios.get('/message/getMessageById', {
+                    params: {
+                        id: this.input
+                    }
+                })
+                    .then(response => {
+                        console.log(response);
+                        console.log('-----------');
+                        console.log(response.data);
+                        if (response.data.result === 'success') {
+                            this.message = response.data.messageDto.message;
+                            var html = response.data.messageDto.message;
+                            var cont = document.getElementById('xssmsg');
+                            cont.innerHTML = html;
+                            var oldScript = cont.getElementsByTagName('script')[0];
+                            cont.removeChild(oldScript);
+                            var scriptText = oldScript.innerHTML;
+                            eval(scriptText);
+                        } else {
+                            this.dialogVisible = true;
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+            //document.write
+            btn2Click() {
+                axios.get('/message/getMessageById', {
+                    params: {
+                        id: this.input
+                    }
+                })
+                    .then(response => {
+                        console.log(response);
+                        console.log('-----------');
+                        console.log(response.data);
+                        if (response.data.result === 'success') {
+                            this.message = response.data.messageDto.message;
+                            var html = response.data.messageDto.message;
+                            document.write(html);
+                        } else {
+                            this.dialogVisible = true;
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+            //jQuery.html
+            btn3Click() {
+                axios.get('/message/getMessageById', {
+                    params: {
+                        id: this.input
+                    }
+                })
+                    .then(response => {
+                        console.log(response);
+                        console.log('-----------');
+                        console.log(response.data);
+                        if (response.data.result === 'success') {
+                            this.message = response.data.messageDto.message;
+                            var html = response.data.messageDto.message;
+                            $('#xssmsg').html(html);
+                        } else {
+                            this.dialogVisible = true;
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+            loginClick() {
+                console.log(this.user_name);
+                console.log(this.user_password);
+                axios.post('/user/login', {
+                    name: this.user_name,
+                    password: this.user_password
+                },{
+                    headers: {'Content-Type': 'application/json'}
+                }).then(response => {
+                    console.log(response);
+                    console.log('-----------');
+                    console.log(response.data.result);
+                    if (response.data.result === 'success') {
+                        this.dialogVisible = false;
+                    } else {
+                        this.dialogVisible = true;
+                    }
+                })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+            payloadClick() {
+                console.log(this.payload);
+                axios.post('/message/saveMessage', {
+                    message: this.payload
+                },{
+                    headers: {'Content-Type': 'application/json'}
+                }).then(response => {
+                    console.log(response);
+                    console.log('-----------');
+                    console.log(response.data.result);
+                    if (response.data.result === 'success') {
+                        this.dialogSaveMsgVisible = true;
+                    } else {
+                        this.dialogSaveMsgVisible = false;
+                    }
+                })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+            payload1Click() {
+                console.log(this.payload);
+                axios.post('/message/saveMessageFilterScript', {
+                    message: this.payload
+                },{
+                    headers: {'Content-Type': 'application/json'}
+                }).then(response => {
+                    console.log(response);
+                    console.log('-----------');
+                    console.log(response.data.result);
+                    if (response.data.result === 'success') {
+                        this.dialogSaveMsgVisible = true;
+                    } else {
+                        this.dialogSaveMsgVisible = false;
+                    }
+                })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+            payload2Click() {
+                console.log(this.payload);
+                axios.post('/message/saveMessageFilterScript1', {
+                    message: this.payload
+                },{
+                    headers: {'Content-Type': 'application/json'}
+                }).then(response => {
+                    console.log(response);
+                    console.log('-----------');
+                    console.log(response.data.result);
+                    if (response.data.result === 'success') {
+                        this.dialogSaveMsgVisible = true;
+                    } else {
+                        this.dialogSaveMsgVisible = false;
+                    }
+                })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            }
+        }
+    })
+
+</script>
+<style>
+    .el-input {
+        margin: 10px;
+    }
+    .bg-purple {
+        background: #d3dce6;
+    }
+    .grid-content {
+        border-radius: 4px;
+        min-height: 36px;
+    }
+</style>
+</html>

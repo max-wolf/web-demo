@@ -14,4 +14,8 @@
                 message
         from message_board
     </select>
+
+    <insert id="saveMessage" parameterType="org.ptkl.webdemo.entity.MessageDto">
+        insert into message_board(message) values (#{message})
+    </insert>
 </mapper>

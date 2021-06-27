@@ -15,4 +15,6 @@ public interface MessageMapper {
     MessageDto getMessageById(@Param("id") int id);
 
     List<MessageDto> getMessage();
+
+    int saveMessage(MessageDto messageDto);
 }

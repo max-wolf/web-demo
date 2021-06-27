@@ -20,4 +20,8 @@ public class MessageService {
     public List<MessageDto> getMessage() {
         return messageMapper.getMessage();
     }
+
+    public int saveMessage(MessageDto messageDto) {
+        return messageMapper.saveMessage(messageDto);
+    }
 }

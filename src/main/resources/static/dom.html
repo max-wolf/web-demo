@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WebDemo</title>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<div id="t"></div>
+<input type="text" id="text" value=""/>
+<input type="button" id="s" value="write" onclick="test()"/>
+
+<br>
+<div id="tt"></div>
+
+</body>
+
+<script>
+    function test(){
+        var str=document.getElementById("text").value;
+        document.getElementById("t").innerHTML = "<a href='"+str+"'>testLink</a>";
+    }
+    // <a href='index.html'>testLink</a>
+    // <a href='' onclick=alert(document.cookie) //'>testLink</a>
+    // <a href=''><img src=# onerror=alert(document.cookie) /><''>testLink</a>
+    /* payload
+    ' onclick=alert(document.cookie) //
+    '><img src=# onerror=alert(document.cookie) /><'
+     */
+
+    $(function(){
+        var str = getUrlParam('str');
+        console.log(str);
+        document.getElementById("tt").innerHTML = "<a href='"+str+"'>testLink</a>";
+    });
+
+    function getUrlParam(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+        var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+        if (r != null) return unescape(r[2]); return null; //返回参数值
+    }
+
+</script>
+
+
+</html>

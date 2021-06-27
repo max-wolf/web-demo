@@ -7,7 +7,13 @@
 </head>
 <body>
 <div id="app">
-    <el-button type="text" @click="dialogVisible = true">点击打开 Dialog</el-button>
+    <el-button type="text" @click="dialogVisible = true">登录</el-button>
+    <br>
+
+    <el-row :gutter="20">
+        <el-col :span="16"><el-input v-model="payload" placeholder="payload"></el-input></el-col>
+        <el-col :span="6"><el-button type="primary" @click="payloadClick">存储型</el-button></el-col>
+    </el-row>
 
     <el-dialog
             title="提示"
@@ -25,17 +31,50 @@
         </span>
     </el-dialog>
 
+    <el-dialog
+            title="提示"
+            :visible.sync="dialogSaveMsgVisible"
+            :close-on-click-modal="false"
+            width="40%">
+        <span>保存成功</span>
 
-    <el-button @click="btn0Click">Button</el-button>
+        <span slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="dialogSaveMsgVisible = false">确 定</el-button>
+        </span>
+    </el-dialog>
 
-    <el-input v-model="input" placeholder="请输入内容"></el-input>
+    <el-row :gutter="20">
+        <el-col :span="6"><el-input v-model="input" placeholder="请输入内容"></el-input></el-col>
+        <el-col :span="6"><el-button @click="btn0Click">查找</el-button></el-col>
+    </el-row>
 
-    <!--
-        <div>{{message}}</div>
-    -->
-    <div v-html="message"></div>
 
-    <el-button @click="btn1Click">Button</el-button>
+    <el-row :gutter="20">
+        <el-col :span="24">
+            <div class="grid-content bg-purple">
+                <!-- 双花括号解释为字符串
+                    <div>{{message}}</div>
+                -->
+                <!-- v-html解释html标签-->
+                <div id="xssmsg" v-html="message"></div>
+            </div>
+        </el-col>
+    </el-row>
+
+    <el-row :gutter="20">
+        <el-col :span="16"><el-input v-model="reflect_payload" placeholder="reflect_payload"></el-input></el-col>
+        <el-col :span="6"><el-button type="primary" @click="reflectClick">反射型</el-button></el-col>
+    </el-row>
+
+    <el-row :gutter="20">
+        <el-col :span="24">
+            <div class="grid-content bg-purple">
+                <div id="reflect_xss" v-html="reflect_message"></div>
+            </div>
+        </el-col>
+    </el-row>
+
+    <!--<el-button @click="btn1Click">Button</el-button>
     <template>
         <el-table
                 :data="items"
@@ -64,7 +103,7 @@
                 </template>
             </el-table-column>
         </el-table>
-    </template>
+    </template>-->
 </div>
 </body>
 <!-- import Vue before Element -->
@@ -77,9 +116,13 @@
         el: '#app',
         data: function () {
             return {
+                payload: '',
+                reflect_message: '',
+                reflect_payload: '',
                 user_name: '',
                 user_password: '',
                 dialogVisible: false,
+                dialogSaveMsgVisible: false,
                 btn0State: false,
                 message: '',
                 input: '',
@@ -145,6 +188,42 @@
                     .catch(function (error) {
                         console.log(error);
                     });
+            },
+            payloadClick() {
+                console.log(this.payload);
+                axios.post('/message/saveMessage', {
+                    message: this.payload
+                },{
+                    headers: {'Content-Type': 'application/json'}
+                }).then(response => {
+                    console.log(response);
+                    console.log('-----------');
+                    console.log(response.data.result);
+                    if (response.data.result === 'success') {
+                        this.dialogSaveMsgVisible = true;
+                    } else {
+                        this.dialogSaveMsgVisible = false;
+                    }
+                })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+            reflectClick() {
+                axios.get('/message/reflectXSS', {
+                    params: {
+                        message: this.reflect_payload
+                    }
+                })
+                    .then(response => {
+                        console.log(response);
+                        console.log('-----------');
+                        console.log(response.data);
+                        this.reflect_message = response.data.message;
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
             }
         }
     })
@@ -153,6 +232,13 @@
 <style>
     .el-input {
         margin: 10px;
+    }
+    .bg-purple {
+        background: #d3dce6;
+    }
+    .grid-content {
+        border-radius: 4px;
+        min-height: 36px;
     }
 </style>
 </html>

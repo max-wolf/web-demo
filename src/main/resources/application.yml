@@ -9,3 +9,8 @@ spring:
       enabled: true
 mybatis:
   mapper-locations: classpath:mapper/*
+server:
+  servlet:
+    session:
+      cookie:
+        http-only: false
